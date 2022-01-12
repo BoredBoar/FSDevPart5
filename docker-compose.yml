@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+
+    web:
+        # build: 
+        #     context: ${PWD}/web
+        #     dockerfile: dockerfile
+        image: node:14.18-alpine
+        stdin_open: true # docker run -i
+        tty: true        # docker run -t
+        entrypoint: /bin/sh
+        env_file: ${PWD}/.env
+        restart: unless-stopped
+        volumes:
+            - ${PWD}:/data
+            - /data/node_modules
+        ports:
+            - "3000:3000"
+        environment:
+            - TZ=America/Chicago
