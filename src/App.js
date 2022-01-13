@@ -11,9 +11,6 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [user, setUser] = useState(null) 
   const [notifyMessage, setNotifyMessage] = useState(null)
 
@@ -44,17 +41,16 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogUser')
   }
 
-  const handleCreate = async (event) => {
-    event.preventDefault()
-
+  const handleCreate = async (blog) => {
+ 
     try {
-      const response = await blogService.postBlog({token:user.token,blog:{title,author,url}})
+      const response = await blogService.postBlog({token:user.token,blog:blog})
       blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(response))
       setNotifyMessage({msg: `A new blog "${response.title}" by ${response.author} added`, type: 'success'})
         setTimeout(() => {setNotifyMessage(null)}, 5000)
     } catch(exception) {
-      setNotifyMessage({msg: `An error occurred while trying to add "${title}"`, type: 'error'})
+      setNotifyMessage({msg: `An error occurred while trying to add "${blog.title}"`, type: 'error'})
         setTimeout(() => {setNotifyMessage(null)}, 5000)
     }
   }
@@ -93,7 +89,7 @@ const App = () => {
         <button onClick={handleLogout}>Logout</button>
       </h3>
       <Togglable buttonLabel="New Blog" ref={blogFormRef}>
-        <Create handleCreate={handleCreate} title={title} setTitle={setTitle} author={author} setAuthor={setAuthor} url={url} setUrl={setUrl} />
+        <Create handleCreate={handleCreate} />
       </Togglable>
       <div>
         {blogs.map(blog =>
