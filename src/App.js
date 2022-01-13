@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import Create from './components/Create'
 import blogService from './services/blogs'
 import loginService from './services/login' 
 import Notifier from './components/Notifier'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -15,6 +16,8 @@ const App = () => {
   const [url, setUrl] = useState('')
   const [user, setUser] = useState(null) 
   const [notifyMessage, setNotifyMessage] = useState(null)
+
+  const blogFormRef = useRef()
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -46,6 +49,7 @@ const App = () => {
 
     try {
       const response = await blogService.postBlog({token:user.token,blog:{title,author,url}})
+      blogFormRef.current.toggleVisibility()
       setBlogs(blogs.concat(response))
       setNotifyMessage({msg: `A new blog "${response.title}" by ${response.author} added`, type: 'success'})
         setTimeout(() => {setNotifyMessage(null)}, 5000)
@@ -84,11 +88,13 @@ const App = () => {
     <div>
       <Notifier message={notifyMessage}/>   
       <h2>blogs</h2>
-      <div>
+      <h3>
         {user.username} logged in 
         <button onClick={handleLogout}>Logout</button>
-      </div>
-      <Create handleCreate={handleCreate} title={title} setTitle={setTitle} author={author} setAuthor={setAuthor} url={url} setUrl={setUrl} />
+      </h3>
+      <Togglable buttonLabel="New Blog" ref={blogFormRef}>
+        <Create handleCreate={handleCreate} title={title} setTitle={setTitle} author={author} setAuthor={setAuthor} url={url} setUrl={setUrl} />
+      </Togglable>
       <div>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
