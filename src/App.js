@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
+import Create from './components/Create'
 import blogService from './services/blogs'
 import loginService from './services/login' 
 
@@ -8,6 +9,9 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
   const [user, setUser] = useState(null) 
 
   const handleLogin = async (event) => {
@@ -38,10 +42,20 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogUser')
   }
 
+  const handleCreate = async (event) => {
+    event.preventDefault()
+    console.log(`Create new blog ${title} ${author} ${url}`);
+    const response = await blogService.postBlog({token:user.token,blog:{title,author,url}})
+    setBlogs(blogs.concat(response))
+    console.log(`respsonse form post ${JSON.stringify(response)}`)
+  }
+
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    const fetchData = async () => {
+      const blogs = await blogService.getAll()
       setBlogs( blogs )
-    )  
+    }
+    fetchData()  
   }, [])
 
   useEffect(() => {
@@ -67,6 +81,7 @@ const App = () => {
         {user.username} logged in 
         <button onClick={handleLogout}>Logout</button>
       </div>
+      <Create handleCreate={handleCreate} title={title} setTitle={setTitle} author={author} setAuthor={setAuthor} url={url} setUrl={setUrl} />
       <div>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
