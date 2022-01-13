@@ -4,6 +4,7 @@ import Login from './components/Login'
 import Create from './components/Create'
 import blogService from './services/blogs'
 import loginService from './services/login' 
+import Notifier from './components/Notifier'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -13,6 +14,7 @@ const App = () => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const [user, setUser] = useState(null) 
+  const [notifyMessage, setNotifyMessage] = useState(null)
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -28,11 +30,8 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.error('Wrong credentials')
-      // setErrorMessage('Wrong credentials')
-      // setTimeout(() => {
-      //   setErrorMessage(null)
-      // }, 5000)
+      setNotifyMessage({msg: `Login attempt failed.`, type: 'error'})
+        setTimeout(() => {setNotifyMessage(null)}, 5000)
     }
   }
 
@@ -44,10 +43,16 @@ const App = () => {
 
   const handleCreate = async (event) => {
     event.preventDefault()
-    console.log(`Create new blog ${title} ${author} ${url}`);
-    const response = await blogService.postBlog({token:user.token,blog:{title,author,url}})
-    setBlogs(blogs.concat(response))
-    console.log(`respsonse form post ${JSON.stringify(response)}`)
+
+    try {
+      const response = await blogService.postBlog({token:user.token,blog:{title,author,url}})
+      setBlogs(blogs.concat(response))
+      setNotifyMessage({msg: `A new blog "${response.title}" by ${response.author} added`, type: 'success'})
+        setTimeout(() => {setNotifyMessage(null)}, 5000)
+    } catch(exception) {
+      setNotifyMessage({msg: `An error occurred while trying to add "${title}"`, type: 'error'})
+        setTimeout(() => {setNotifyMessage(null)}, 5000)
+    }
   }
 
   useEffect(() => {
@@ -69,13 +74,15 @@ const App = () => {
   if(user === null){
     return (
       <div>
+        <Notifier message={notifyMessage}/>
         <h2>login</h2>
         <Login handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword}/>
       </div>
     )
   }
   return (
-    <div>   
+    <div>
+      <Notifier message={notifyMessage}/>   
       <h2>blogs</h2>
       <div>
         {user.username} logged in 
