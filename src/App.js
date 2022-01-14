@@ -6,6 +6,7 @@ import blogService from './services/blogs'
 import loginService from './services/login' 
 import Notifier from './components/Notifier'
 import Togglable from './components/Togglable'
+import _ from 'lodash'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -46,7 +47,7 @@ const App = () => {
     try {
       const response = await blogService.postBlog({token:user.token,blog:blog})
       blogFormRef.current.toggleVisibility()
-      setBlogs(blogs.concat(response))
+      setBlogs(_.sortBy(blogs.concat(response),'likes'))
       setNotifyMessage({msg: `A new blog "${response.title}" by ${response.author} added`, type: 'success'})
         setTimeout(() => {setNotifyMessage(null)}, 5000)
     } catch(exception) {
@@ -58,10 +59,10 @@ const App = () => {
   const handleLike = async (id, blog) => {
     try {
       const response = await blogService.updateBlog(id,blog,user.token)
-      setBlogs(blogs.map(blog => {
-        if(blog.id === response.id) return response
-        return blog
-      }))
+      setBlogs(_(blogs).map(blog => {
+          if(blog.id === response.id) return response
+          return blog
+        }).sortBy('likes').reverse().value())
       setNotifyMessage({msg: `"${response.title}" was successfully updated`, type: 'success'})
         setTimeout(() => {setNotifyMessage(null)}, 5000)
     } catch(excpetion) {
@@ -73,8 +74,9 @@ const App = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const blogs = await blogService.getAll()
-      setBlogs( blogs )
+      const newBlogs = await blogService.getAll()
+      const sortedBlogs = _(newBlogs).sortBy('likes').reverse().value()
+      setBlogs(sortedBlogs)
     }
     fetchData()  
   }, [])
