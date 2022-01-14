@@ -55,6 +55,22 @@ const App = () => {
     }
   }
 
+  const handleLike = async (id, blog) => {
+    try {
+      const response = await blogService.updateBlog(id,blog,user.token)
+      setBlogs(blogs.map(blog => {
+        if(blog.id === response.id) return response
+        return blog
+      }))
+      setNotifyMessage({msg: `"${response.title}" was successfully updated`, type: 'success'})
+        setTimeout(() => {setNotifyMessage(null)}, 5000)
+    } catch(excpetion) {
+      console.error(excpetion)
+      setNotifyMessage({msg: `An error occurred while trying to update "${blog.title}"`, type: 'error'})
+        setTimeout(() => {setNotifyMessage(null)}, 5000)
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       const blogs = await blogService.getAll()
@@ -93,7 +109,7 @@ const App = () => {
       </Togglable>
       <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} handleLike={handleLike} />
         )}
       </div>
     </div>
