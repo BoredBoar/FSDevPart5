@@ -47,7 +47,7 @@ const App = () => {
     try {
       const response = await blogService.postBlog({token:user.token,blog:blog})
       blogFormRef.current.toggleVisibility()
-      setBlogs(_.sortBy(blogs.concat(response),'likes'))
+      setBlogs(_(blogs.concat(response)).sortBy('likes').reverse().value())
       setNotifyMessage({msg: `A new blog "${response.title}" by ${response.author} added`, type: 'success'})
         setTimeout(() => {setNotifyMessage(null)}, 5000)
     } catch(exception) {
@@ -68,6 +68,20 @@ const App = () => {
     } catch(excpetion) {
       console.error(excpetion)
       setNotifyMessage({msg: `An error occurred while trying to update "${blog.title}"`, type: 'error'})
+        setTimeout(() => {setNotifyMessage(null)}, 5000)
+    }
+  }
+
+  const handleRemove = async (id) => {
+    try {
+      const response = await blogService.removeBlog(id,user.token)
+      setBlogs(_(_(blogs).reduce((x,blog) => {
+        if(blog.id !== response.id) x.push(blog)
+        return x
+      },[])).sortBy('likes').reverse().value())
+    } catch(exception) {
+      console.log(exception)
+      setNotifyMessage({msg: `An error occurred while trying to delete blog post`, type: 'error'})
         setTimeout(() => {setNotifyMessage(null)}, 5000)
     }
   }
@@ -111,7 +125,7 @@ const App = () => {
       </Togglable>
       <div>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} handleLike={handleLike} />
+          <Blog key={blog.id} blog={blog} handleLike={handleLike} handleRemove={handleRemove} />
         )}
       </div>
     </div>
