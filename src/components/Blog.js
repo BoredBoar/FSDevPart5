@@ -29,10 +29,10 @@ const Blog = ({blog, handleLike, handleRemove}) => {
   
   return (
     <div>
-      <div className="blog-style" style={hideWhenDetail}>
+      <div className="blog-style blog-collapse" style={hideWhenDetail}>
         {blog.title} {blog.author} <button onClick={toggleDetail}>View</button>
       </div> 
-      <div className="blog-style" style={showWhenDetail}>
+      <div className="blog-style blog-expand" style={showWhenDetail}>
         {blog.title} {blog.author} <button onClick={toggleDetail}>Hide</button>
         <br/>
         {blog.url} <br/>
