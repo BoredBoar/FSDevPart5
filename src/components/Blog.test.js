@@ -73,7 +73,23 @@ describe('Blog component', () => {
         )
 
         expect(div2).not.toHaveStyle('display: none')
-
-
     })
+
+    test('when like button is clicked twice, function handler is called twice', () => {
+        const likeHandler = jest.fn()
+
+        const component = render(
+            <Blog blog={blog} handleLike={likeHandler}/>
+        )
+        
+        const button = component.getByText('View')
+        fireEvent.click(button)
+
+        const likeButton = component.getByText('like')
+        fireEvent.click(likeButton)
+        fireEvent.click(likeButton)
+
+        expect(likeHandler.mock.calls).toHaveLength(2)
+    })
+
 })

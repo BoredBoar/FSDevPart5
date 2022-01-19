@@ -20,6 +20,7 @@ const Create = ({handleCreate}) => {
             <div>
             title
                 <input
+                id="title"
                 type="text"
                 value={title}
                 name="Title"
@@ -29,6 +30,7 @@ const Create = ({handleCreate}) => {
             <div>
             author
                 <input
+                id="author"
                 type="author"
                 value={author}
                 name="Author"
@@ -38,6 +40,7 @@ const Create = ({handleCreate}) => {
             <div>
             url
                 <input
+                id="url"
                 type="text"
                 value={url}
                 name="URL"
