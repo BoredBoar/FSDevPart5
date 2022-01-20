@@ -13,8 +13,9 @@ services:
         env_file: ${PWD}/.env
         restart: unless-stopped
         volumes:
-            - ${PWD}:/data
+            - ${PWD}:/data:ro
             - /data/node_modules
+            - /data/.eslintcache
         # ports:
         #     - "3000:3000"
         environment:

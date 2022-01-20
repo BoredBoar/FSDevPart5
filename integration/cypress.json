@@ -1,0 +1,5 @@
+{
+    "integrationFolder":"/e2e/integration",
+    "testFiles":"*.js",
+    "video":false
+}
